@@ -1,0 +1,22 @@
+<launch>
+  <!-- The rpy in the comment uses the extrinsic XYZ convention, which is the same as is used in a URDF. See
+       http://wiki.ros.org/geometry2/RotationMethods and https://en.wikipedia.org/wiki/Euler_angles for more info. -->
+  <!-- xyz="-0.0148908 -0.0631543 0.160995" rpy="3.12588 3.10488 3.12867" -->
+
+  <!-- Calibrated transform from tool to optical frame -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="measured_tf_broadcaster"
+      args="-0.00768208 -0.0517645 0.142671   -0.0068528 -0.00333331 0.00402375 0.999963 tool0 gt_color_optical" />
+
+  <!-- Known transform copied from realsense-ros driver in ros2 -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="camera_internal_frame_broadcaster_1" 
+      args="-4.597177030518651e-05 5.696711741620675e-05 -1.8232605725643225e-05   0.0003477285208646208 0.0007630710606463253 -0.0015577893937006593 0.9999984502792358 camera_link camera_color_frame" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="camera_internal_frame_broadcaster_2"
+      args="0.0 0.0 0.0   -0.5 0.5 -0.5 0.5 camera_color_frame camera_color_optical_frame" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="camera_internal_frame_broadcaster_3"
+      args="0.0 0.0 0.0   0.0 0.0 0.0 1.0 camera_link camera_depth_frame" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="camera_internal_frame_broadcaster_4"
+      args="0.0 0.0 0.0   -0.5 0.5 -0.5 0.5 camera_depth_frame camera_depth_optical_frame" />
+      
+  <!-- Transform from tool to camera link -->
+  <node pkg="ur_grasping" type="tool_to_camlink_tf.py" name="cam_link_tf_broadcaster"/>
+</launch>
