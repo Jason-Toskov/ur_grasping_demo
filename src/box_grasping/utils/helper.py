@@ -2,7 +2,14 @@
 
 import rospy
 import tf2_ros
+import yaml
 from tf import TransformListener
+
+
+def load_yaml(path):
+    with open(path, "r") as f:
+        output = yaml.safe_load(f)
+    return output
 
 
 def init_tf_tree() -> TransformListener:

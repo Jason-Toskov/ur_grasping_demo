@@ -1,0 +1,5 @@
+paths:
+  root: /home/jason/catkin_ws/src/ur_grasping/src/box_grasping/
+  key_locs: configs/preset_locs.yaml
+  trajectories:
+    scene_scan: configs/trajectories/scene_scan.csv

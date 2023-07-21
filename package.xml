@@ -72,6 +72,7 @@
   <depend>python3-numpy</depend>
   <depend>python3-scipy</depend>
   <depend>python3-yaml</depend>
+  <depend>python3-pydantic</depend>
   
   
 
