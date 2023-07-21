@@ -27,13 +27,16 @@ class GraspDemoMaster:
             Path(self.params.paths.root) / self.params.paths.trajectories.scene_scan
         )
 
+    def scan_object(self):
+        for joint in self.scan_joints:
+            self.mover.move(joint, motion_type=MotionType.joint)
+
     def main(self):
         while not rospy.is_shutdown():
             self.mover.move(self.key_joint_states["home"], motion_type=MotionType.joint)
             rospy.sleep(1)
 
-            for joint in self.scan_joints:
-                self.mover.move(joint, motion_type=MotionType.joint)
+            self.scan_object()
 
 
 if __name__ == "__main__":
