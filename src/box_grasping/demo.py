@@ -2,7 +2,9 @@
 
 from pathlib import Path
 
+import pandas as pd
 import rospy
+from geometry_msgs.msg import Point, Pose, PoseStamped, Quaternion
 
 from box_grasping.config import Config
 from box_grasping.motion.ur3e_motion import MotionType, Ur3eMover
@@ -22,31 +24,30 @@ class GraspDemoMaster:
 
         self.key_joint_states = load_yaml(Path(self.params.paths.root) / self.params.paths.key_locs)
 
-        self.state_1 = [
-            -1.090975586568014,
-            -1.213568465118744,
-            1.61973745027651,
-            -2.103788991967672,
-            -1.33171254793276,
-            -0.6551120916949671,
-        ]
+        self.scan_waypoints = self.load_trajectory(
+            Path(self.params.paths.root) / self.params.paths.trajectories.scene_scan
+        )
 
-        self.state_2 = [
-            0.24536804854869843,
-            -1.2220621568015595,
-            1.6057284514056605,
-            -2.203883310357565,
-            -1.6248214880572718,
-            -0.6551120916949671,
-        ]
+    def load_trajectory(self, path):
+        trajectory_df = pd.read_csv(path)
+        waypoints = []
+        for _, row in trajectory_df.iterrows():
+            position = Point(x=row["pos.x"], y=row["pos.y"], z=row["pos.y"])
+            orientation = Quaternion(
+                x=row["orient.x"], y=row["orient.y"], z=row["orient.z"], w=row["orient.w"]
+            )
+            pose = PoseStamped(pose=Pose(position=position, orientation=orientation))
+            pose.header.frame_id = row["frame_id"]
+            waypoints.append(pose)
+        return waypoints
 
     def main(self):
         while not rospy.is_shutdown():
-            self.mover.move(self.state_1, motion_type=MotionType.joint)
+            self.mover.move(self.key_joint_states["test_locs"][1], motion_type=MotionType.joint)
 
             rospy.sleep(1)
 
-            self.mover.move(self.state_2, motion_type=MotionType.joint)
+            self.mover.move(self.key_joint_states["home"], motion_type=MotionType.joint)
 
             rospy.sleep(1)
 

@@ -5,3 +5,20 @@ home:
   wrist_1_joint: -1.2552744013122101
   wrist_2_joint: -1.5688207785235804
   wrist_3_joint: -0.45167857805360967
+
+test_locs:
+  1:
+    elbow_joint: 1.61973745027651
+    shoulder_lift_joint: -1.213568465118744
+    shoulder_pan_joint: -1.090975586568014
+    wrist_1_joint: -2.103788991967672
+    wrist_2_joint: -1.33171254793276
+    wrist_3_joint: -0.6551120916949671
+
+  2: 
+    elbow_joint: 1.6057284514056605
+    shoulder_lift_joint: -1.2220621568015595
+    shoulder_pan_joint: 0.24536804854869843
+    wrist_1_joint: -2.203883310357565
+    wrist_2_joint: -1.6248214880572718
+    wrist_3_joint: -0.6551120916949671
