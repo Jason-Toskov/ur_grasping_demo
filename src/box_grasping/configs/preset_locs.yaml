@@ -6,6 +6,14 @@ home:
   wrist_2_joint: -1.5688207785235804
   wrist_3_joint: -0.45167857805360967
 
+scan_start:
+  elbow_joint: 0.6788581053363245
+  shoulder_lift_joint: -0.17730768144641118
+  shoulder_pan_joint: -2.1797850767718714
+  wrist_1_joint: -0.9331165713122864
+  wrist_2_joint: -1.3814361731158655
+  wrist_3_joint: 0.015631377696990967
+
 test_locs:
   1:
     elbow_joint: 1.61973745027651

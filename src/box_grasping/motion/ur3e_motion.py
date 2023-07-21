@@ -21,6 +21,7 @@ PlanTuple = Tuple[bool, RobotTrajectory, float, MoveItErrorCodes]
 class MotionType(str, Enum):
     joint = "joint"
     pose = "pose"
+    plan = "plan"
 
 
 class Ur3eMover:
@@ -45,37 +46,41 @@ class Ur3eMover:
 
     def move(
         self,
-        target: Union[list, PoseStamped],
+        target: Union[list, PoseStamped, RobotTrajectory],
         motion_type: MotionType,
-        plan: Union[RobotTrajectory, None] = None,
         confirm_plan: bool = False,
     ) -> bool:
-        """Execute a robot motion to a specified target.
+        """Execute a robot motion. Motion can either be a precomputed plan or to a
+        specified target.
 
         Args:
-            target: Target to move to.
-            motion_type: Type of motion.
-            plan: Plan to execute if one exists. Defaults to None.
+            target: Target to move to or plan to execute.
+            motion_type: Type of motion that should be done.
             confirm_plan: Whether to require motion plan confirmation.
                 A False value here can be overridden by the global option
                 `self.vis_all_plans`. Defaults to False.
 
         Raises:
+            TypeError: Raised if a plan is provided of an invalid type.
             ValueError: Raised if `motion_type` is invalid.
 
         Returns:
             Flag indicating whether the motion was attempted.
         """
-
-        # Set motion target
-        if motion_type == MotionType.joint:
-            self.move_group.set_joint_value_target(target)
-        elif motion_type == MotionType.pose:
-            self.move_group.set_pose_target(target)
+        if motion_type is MotionType.plan:
+            if isinstance(target, RobotTrajectory):
+                plan = target
+            else:
+                raise TypeError(f"Plan must be of type RobotTrajectory, not {type(target)}")
         else:
-            raise ValueError(f"Motion type {motion_type} not supported")
+            # Set motion target
+            if motion_type == MotionType.joint:
+                self.move_group.set_joint_value_target(target)
+            elif motion_type == MotionType.pose:
+                self.move_group.set_pose_target(target)
+            else:
+                raise ValueError(f"Motion type {motion_type} not supported")
 
-        if plan is None:
             plan_tuple: PlanTuple = self.move_group.plan()
             plan = self.unpack_plan(plan_tuple)
 
@@ -87,6 +92,7 @@ class Ur3eMover:
         # Execute plan
         if not (confirm_plan or self.vis_all_plans) or self.check_plan_visually(plan):
             attempted = self.move_group.execute(plan, wait=True)
+            rospy.loginfo("plan done!")
         else:
             rospy.loginfo("Plan is invalid!")
             attempted = False

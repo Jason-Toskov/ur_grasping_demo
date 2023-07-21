@@ -6,7 +6,7 @@ import rospy
 
 from box_grasping.config import Config
 from box_grasping.motion.ur3e_motion import MotionType, Ur3eMover
-from box_grasping.utils.moveit_helper import load_trajectory
+from box_grasping.utils.moveit_helper import load_joint_trajectory
 from box_grasping.utils.tf_helper import load_yaml
 from box_grasping.visual.realsense import RealSenseProcessor
 
@@ -23,19 +23,17 @@ class GraspDemoMaster:
 
         self.key_joint_states = load_yaml(Path(self.params.paths.root) / self.params.paths.key_locs)
 
-        self.scan_waypoints = load_trajectory(
+        self.scan_joints = load_joint_trajectory(
             Path(self.params.paths.root) / self.params.paths.trajectories.scene_scan
         )
 
     def main(self):
         while not rospy.is_shutdown():
-            self.mover.move(self.key_joint_states["test_locs"][1], motion_type=MotionType.joint)
-
-            rospy.sleep(1)
-
             self.mover.move(self.key_joint_states["home"], motion_type=MotionType.joint)
-
             rospy.sleep(1)
+
+            for joint in self.scan_joints:
+                self.mover.move(joint, motion_type=MotionType.joint)
 
 
 if __name__ == "__main__":
