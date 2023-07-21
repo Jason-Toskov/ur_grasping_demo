@@ -2,13 +2,12 @@
 
 from pathlib import Path
 
-import pandas as pd
 import rospy
-from geometry_msgs.msg import Point, Pose, PoseStamped, Quaternion
 
 from box_grasping.config import Config
 from box_grasping.motion.ur3e_motion import MotionType, Ur3eMover
-from box_grasping.utils.helper import load_yaml
+from box_grasping.utils.moveit_helper import load_trajectory
+from box_grasping.utils.tf_helper import load_yaml
 from box_grasping.visual.realsense import RealSenseProcessor
 
 
@@ -24,22 +23,9 @@ class GraspDemoMaster:
 
         self.key_joint_states = load_yaml(Path(self.params.paths.root) / self.params.paths.key_locs)
 
-        self.scan_waypoints = self.load_trajectory(
+        self.scan_waypoints = load_trajectory(
             Path(self.params.paths.root) / self.params.paths.trajectories.scene_scan
         )
-
-    def load_trajectory(self, path):
-        trajectory_df = pd.read_csv(path)
-        waypoints = []
-        for _, row in trajectory_df.iterrows():
-            position = Point(x=row["pos.x"], y=row["pos.y"], z=row["pos.y"])
-            orientation = Quaternion(
-                x=row["orient.x"], y=row["orient.y"], z=row["orient.z"], w=row["orient.w"]
-            )
-            pose = PoseStamped(pose=Pose(position=position, orientation=orientation))
-            pose.header.frame_id = row["frame_id"]
-            waypoints.append(pose)
-        return waypoints
 
     def main(self):
         while not rospy.is_shutdown():
