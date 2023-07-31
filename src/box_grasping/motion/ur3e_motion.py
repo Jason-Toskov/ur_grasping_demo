@@ -67,6 +67,7 @@ class Ur3eMover:
         Returns:
             Flag indicating whether the motion was attempted.
         """
+
         if motion_type is MotionType.plan:
             if isinstance(target, RobotTrajectory):
                 plan = target
@@ -92,7 +93,6 @@ class Ur3eMover:
         # Execute plan
         if not (confirm_plan or self.vis_all_plans) or self.check_plan_visually(plan):
             attempted = self.move_group.execute(plan, wait=True)
-            rospy.loginfo("plan done!")
         else:
             rospy.loginfo("Plan is invalid!")
             attempted = False

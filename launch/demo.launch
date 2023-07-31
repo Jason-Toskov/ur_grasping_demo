@@ -1,0 +1,16 @@
+<launch>
+  
+  <include file="$(find ur_robot_driver)/launch/ur3e_bringup.launch">
+    <arg name="robot_ip" value="192.168.0.100"/>
+    <arg name="kinematics_config" value="$(find ur_grasping)/cfg/ur3e_calibration.yaml"/>
+  </include>
+
+  <include file="$(find ur_grasping)/launch/cam_pose_publisher.launch"/>
+
+  <include file="$(find ur3e_moveit_config)/launch/moveit_planning_execution.launch"/>
+
+  <include file="$(find ur_grasping)/launch/realsense_processor.launch"/>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ur_grasping)/cfg/moveit.rviz" required="true" />
+
+</launch>
