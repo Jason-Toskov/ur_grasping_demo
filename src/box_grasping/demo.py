@@ -6,12 +6,12 @@ import rospy
 from laser_assembler.srv import AssembleScans2, AssembleScans2Request
 from sensor_msgs.msg import PointCloud2
 from std_msgs.msg import Bool
+from ur_grasping.srv import Grasp, PCLFwdStatus, PCLFwdStatusRequest
 
 from box_grasping.config import Config
 from box_grasping.motion.ur3e_motion import MotionType, Ur3eMover
 from box_grasping.utils.moveit_helper import load_joint_trajectory
 from box_grasping.utils.tf_helper import load_yaml
-from ur_grasping.srv import PCLFwdStatus, PCLFwdStatusRequest
 
 
 class GraspDemoMaster:
@@ -27,6 +27,9 @@ class GraspDemoMaster:
         self.stitch_pcds = rospy.ServiceProxy(
             "/realsense_processing/stitch_pcd_service", AssembleScans2
         )
+
+        rospy.wait_for_service("change_width_and_force")
+        self.set_gripper_width = rospy.ServiceProxy("change_width_and_force", Grasp)
 
         self.params = Config.parse_obj(load_yaml(params_path))
 
@@ -61,7 +64,11 @@ class GraspDemoMaster:
             self.mover.move(self.key_joint_states["home"], motion_type=MotionType.joint)
             rospy.sleep(1)
 
+            self.set_gripper_width(100, 20)
+
             pcd = self.scan_object()
+
+            self.set_gripper_width(0, 20)
 
             self.pcl_viz_pub.publish(pcd)
 
