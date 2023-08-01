@@ -3,6 +3,7 @@
   <include file="$(find ur_robot_driver)/launch/ur3e_bringup.launch">
     <arg name="robot_ip" value="192.168.0.100"/>
     <arg name="kinematics_config" value="$(find ur_grasping)/cfg/ur3e_calibration.yaml"/>
+    <arg name="headless_mode" value="true"/>
   </include>
 
   <include file="$(find ur_grasping)/launch/cam_pose_publisher.launch"/>
