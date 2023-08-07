@@ -14,4 +14,6 @@
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ur_grasping)/cfg/moveit.rviz" required="true" />
 
+  <node name="gripper_control" pkg="ur_grasping" type="rg2_control.py"/>
+
 </launch>

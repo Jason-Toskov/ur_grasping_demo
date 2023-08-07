@@ -30,10 +30,19 @@ To run the demo, first make sure the robot is powered on and connected to the ne
 
   ```bash
   srcros2 
-  ros2 launch realsense2_camera rs_launch.py pointcloud.enable:=true
+  ros2 launch realsense2_camera rs_launch.py pointcloud.enable:=true decimation_filter.enable:=true
   ```
 
 - Terminal 4:
+
+  ```bash
+  srcros2 
+  ros2 param set /camera/camera hole_filling_filter.enable true 
+  ros2 param set /camera/camera spatial_filter.enable true 
+  ros2 param set /camera/camera temporal_filter.enable true
+  ```
+
+- Terminal 5:
 
   ```bash
   srcros1

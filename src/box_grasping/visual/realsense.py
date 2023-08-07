@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
+from typing import Union
+
 import rospy
 import tf2_ros
 from laser_assembler.srv import AssembleScans2, AssembleScans2Request, AssembleScans2Response
 from rospy.timer import TimerEvent
 from sensor_msgs.msg import PointCloud2
 from std_msgs.msg import Bool, Header
+from std_srvs.srv import Trigger, TriggerRequest, TriggerResponse
 
 from box_grasping.utils.tf_helper import init_tf_tree
 from ur_grasping.msg import TFMatchedPCD
@@ -16,6 +19,8 @@ class RealSenseProcessor:
     # Class that provides services to easily interface with an attached RealSense camera
     def __init__(self) -> None:
         rospy.init_node("realsense_processing", anonymous=True)
+
+        self.fwd_pcd_with_timer = rospy.get_param("/realsense_processing/fwd_pcd_with_timer")
 
         rospy.wait_for_service("assemble_scans2")
 
@@ -45,8 +50,13 @@ class RealSenseProcessor:
 
         self.pcd_forward_pub = rospy.Publisher("/pcl_stitcher_input_raw", PointCloud2, queue_size=1)
 
-        # Actual forwarder
-        fwder = rospy.Timer(rospy.Duration(secs=2, nsecs=0), self.fwd_latest_pcd)
+        if self.fwd_pcd_with_timer:
+            # Actual forwarder
+            fwder = rospy.Timer(rospy.Duration(secs=2, nsecs=0), self.fwd_latest_pcd_timer)
+        else:
+            stitch_append_srv = rospy.Service(
+                "/realsense_processing/add_pcd_to_assembler", Trigger, self.fwd_latest_pcd_srv
+            )
 
         rospy.spin()
 
@@ -74,9 +84,20 @@ class RealSenseProcessor:
         # self.pcl_latest = TFMatchedPCD(pcd=data, tf=tf)
         self.pcl_latest = data
 
-    def fwd_latest_pcd(self, event: TimerEvent):
+    def fwd_latest_pcd_timer(self, event: TimerEvent):
         if rospy.get_param("/realsense_processing/pcl_fwd_status"):
             self.pcd_forward_pub.publish(self.pcl_latest)
+
+    def fwd_latest_pcd_srv(self, req: TriggerRequest):
+        if rospy.get_param("/realsense_processing/pcl_fwd_status"):
+            self.pcd_forward_pub.publish(self.pcl_latest)
+            return TriggerResponse(success=True)
+        else:
+            rospy.loginfo(
+                "Pcd forwarding is not active, set '/realsense_processing/"
+                "pcl_fwd_status' to 'True' to enable!"
+            )
+            return TriggerResponse(success=False)
 
     def stitch_pcds(self, req: AssembleScans2Request) -> AssembleScans2Response:
         # This should call laser assembler with these times to stitch the relevant point clouds
