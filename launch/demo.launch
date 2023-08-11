@@ -16,4 +16,11 @@
 
   <node name="gripper_control" pkg="ur_grasping" type="rg2_control.py"/>
 
+  <node name="detect_grasps" pkg="gpd_ros" type="detect_grasps" output="screen">
+    <param name="cloud_type" value="0" />
+    <param name="cloud_topic" value="/cloud_stitched" />
+    <param name="config_file" value="/home/jason/catkin_ws/src/ur_grasping/cfg/gpd_ros_eigen_params.cfg" />
+    <param name="rviz_topic" value="plot_grasps" />
+  </node>
+
 </launch>

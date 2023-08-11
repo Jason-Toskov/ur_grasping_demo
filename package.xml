@@ -74,6 +74,7 @@
   <depend>python3-yaml</depend>
   <depend>python3-pydantic</depend>
   <depend>python3-pandas</depend>
+  <depend>python3-opencv</depend>
   
 
 
